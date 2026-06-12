@@ -1,0 +1,48 @@
+name: Coverage
+
+on:
+  push:
+    branches: [ main ]
+  pull_request: ~
+
+  workflow_dispatch:
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+env:
+  OS: "ubuntu-latest"
+  PYTHON: "3.14"
+
+permissions: {}
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    environment: codecov
+    permissions:
+      contents: read
+    steps:
+      - name: Acquire sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ env.PYTHON }}
+
+      - name: Install project
+        run: uv sync --group test
+
+      - name: Run tests with coverage
+        run: uv run poe coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          env_vars: OS,PYTHON
+          fail_ci_if_error: false

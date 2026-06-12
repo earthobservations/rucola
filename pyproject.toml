@@ -1,0 +1,207 @@
+[build-system]
+requires = ["uv_build>=0.11.19,<0.12"]
+build-backend = "uv_build"
+
+[project]
+name = "rucola"
+version = "0.1.0"
+description = "Climate station data homogenization implementing the González-Rouco et al. (2001) six-step procedure with six pluggable breakpoint tests"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE.md"]
+authors = [
+    { name = "Benjamin Gutzmann", email = "benjamin@eobs.org" },
+    { name = "Claude", email = "noreply@anthropic.com" },
+]
+keywords = [
+    "climate",
+    "climatology",
+    "homogenization",
+    "inhomogeneity",
+    "meteorology",
+    "SNHT",
+    "Buishand",
+    "Pettitt",
+    "Worsley",
+    "Easterling-Peterson",
+    "STARS",
+    "Rodionov",
+    "breakpoint-detection",
+    "changepoint",
+    "reference-series",
+    "detection",
+    "correction",
+    "time-series",
+    "station-data",
+    "quality-control",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Typing :: Typed",
+]
+dependencies = [
+    "polars>=1.41.2,<2.0.0",
+]
+
+[project.optional-dependencies]
+duckdb = ["duckdb>=1.5.3,<2.0.0"]
+tqdm = ["tqdm>=4.0,<5.0.0"]
+
+[dependency-groups]
+dev = [
+    "deptry>=0.23.0,<1.0.0",
+    "poethepoet>=0.46.0,<1.0.0",
+    "ruff>=0.15.16,<1.0.0",
+    "ty>=0.0.43,<1.0.0",
+    "zizmor>=1.0.0,<2.0.0",
+]
+test = [
+    "mktestdocs>=0.2.5,<1.0.0",
+    "pytest>=9.0.3,<10.0.0",
+    "pytest-cov>=7.1.0,<8.0.0",
+    "wetterdienst>=0.121.1,<1.0.0",
+]
+docs = [
+    "mike>=2.1.3,<3",
+    "mkdocs>=1.4.3,<2",
+    "mkdocs-material>=9.1.15,<10",
+    "mkdocstrings-python>=1.1.2,<3",
+]
+notebooks = [
+    "altair>=6.2.1,<7.0.0",
+    "duckdb>=1.5.3,<2.0.0",
+    "marimo>=0.23.9,<1",
+]
+
+[tool.poe.tasks.format]
+sequence = [
+    { cmd = "uv run ruff format" },
+    { cmd = "uv run ruff check --fix" },
+]
+
+[tool.poe.tasks.lint]
+sequence = [
+    { cmd = "uv run ruff format --check" },
+    { cmd = "uv run ruff check" },
+]
+
+[tool.poe.tasks.type]
+cmd = "uv run ty check"
+
+[tool.poe.tasks.test]
+cmd = "uv run --group test pytest -m 'not integration and not slow'"
+
+[tool.poe.tasks.test-unit]
+cmd = "uv run --group test pytest -m unit -v"
+
+[tool.poe.tasks.test-slow]
+cmd = "uv run --group test pytest -m 'slow and not integration' -v"
+
+[tool.poe.tasks.test-integration]
+cmd = "uv run --group test pytest -m integration -v"
+
+[tool.poe.tasks.test-all]
+cmd = "uv run --group test pytest -v"
+
+[tool.poe.tasks.docs-serve]
+cmd = "uv run --group docs mkdocs serve"
+
+[tool.poe.tasks.docs-build]
+cmd = "uv run --group docs mkdocs build"
+
+[tool.poe.tasks.coverage]
+cmd = "uv run --group test pytest --cov-report=xml"
+
+[tool.poe.tasks.audit]
+cmd = "uv audit"
+
+[tool.poe.tasks.deptry]
+cmd = "uv run deptry src"
+
+[tool.poe.tasks.zizmor]
+cmd = "uv run zizmor ."
+
+[tool.poe.tasks.check]
+sequence = [
+    { ref = "lint" },
+    { ref = "type" },
+    { ref = "audit" },
+    { ref = "test" },
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov --cov-report=term-missing -q"
+filterwarnings = [
+    "ignore:cannot collect test class 'TestResult':pytest.PytestCollectionWarning",
+]
+markers = [
+    "integration: requires network access to wetterdienst / DWD API",
+    "slow: computationally expensive; excluded from the default test run",
+    "unit: fast pure-function tests",
+]
+
+[tool.coverage.run]
+source = ["rucola"]
+branch = true
+omit = []
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+skip_empty = true
+precision = 1
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+    "raise NotImplementedError",
+]
+
+[tool.ruff]
+include = ["src/**/*.py", "tests/**/*.py", "notebooks/**/*.py"]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "COM812", # conflicts with ruff formatter
+    "D203",   # incompatible with D211
+    "D213",   # incompatible with D212
+    "RUF002", # ambiguous unicode in docstrings (intentional in scientific notation)
+    "RUF003", # ambiguous unicode in comments (intentional in scientific notation)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"notebooks/**" = [
+    "ANN",     # no type annotations in notebook cells
+    "D",       # no docstrings in notebook cells
+    "I001",    # import sorting inside cell functions
+    "N803",    # marimo passes class names (PascalCase) as cell arguments
+    "PLC0415", # imports inside cell functions are expected
+    "PLR0913", # cell functions can have many reactive dependencies
+    "PLR1711", # marimo cells need bare `return` to signal no output
+    "RUF001",  # en-dashes intentional in markdown strings
+    "RUF002",  # en-dashes intentional in markdown strings
+    "ARG001",  # unused args are reactive deps in marimo
+    "B018",    # bare expressions display output in marimo cells
+    "C901",    # complex cell functions are acceptable in notebooks
+    "ERA001",  # commented-out code blocks are intentional usage recipes
+    "N806",    # uppercase _CONSTANTS inside cell functions are intentional
+    "PERF401", # list.append in loops is fine in notebooks
+    "PLR0915", # large cells can exceed the statement limit
+    "PLR2004", # magic values are readable in notebook context
+]
+"tests/**" = [
+    "S101",  # assert is required in pytest tests
+    "S311",  # seeded PRNG is intentional for reproducible test fixtures
+]

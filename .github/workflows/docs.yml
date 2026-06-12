@@ -1,0 +1,44 @@
+name: Docs
+
+on:
+  push:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHON: "3.14"
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: false
+          python-version: ${{ env.PYTHON }}
+
+      - name: Install project
+        run: uv sync --group docs
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy latest (main branch)
+        if: github.event_name == 'push'
+        run: uv run mike deploy --push latest
+
+      - name: Deploy release
+        if: github.event_name == 'release'
+        run: uv run mike deploy --push ${{ github.event.release.tag_name }}

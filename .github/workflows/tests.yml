@@ -1,0 +1,51 @@
+name: Tests
+
+on:
+  pull_request: ~
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+permissions: {}
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ "ubuntu-latest" ]
+        python-version: [ "3.12", "3.13", "3.14" ]
+        include:
+          - os: "windows-latest"
+            python-version: "3.14"
+          - os: "macos-latest"
+            python-version: "3.14"
+
+    continue-on-error: true
+
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON: ${{ matrix.python-version }}
+
+    name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    steps:
+      - name: Acquire sources
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ env.PYTHON }}
+
+      - name: Install project
+        run: uv sync --group test
+
+      - name: Run tests
+        run: uv run poe test
