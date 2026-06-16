@@ -187,7 +187,7 @@ def _rich_detection_result() -> DetectionResult:
                 factor=1.15,
                 was_applied=True,
                 test_results=[
-                    _tr(name="snht",     sig=True,  break_year=2005, stat=15.0),
+                    _tr(name="snht", sig=True, break_year=2005, stat=15.0),
                     _tr(name="buishand", sig=False, break_year=2003, stat=8.0),
                 ],
             ),
@@ -209,7 +209,7 @@ def _rich_detection_result() -> DetectionResult:
                 factor=1.0,
                 was_applied=False,
                 test_results=[
-                    _tr(name="snht",     sig=True, break_year=1998, stat=12.0),
+                    _tr(name="snht", sig=True, break_year=1998, stat=12.0),
                     _tr(name="buishand", sig=True, break_year=2004, stat=11.0),
                 ],
             ),
@@ -278,8 +278,8 @@ def test_to_markdown_significant_test_is_bold() -> None:
 def test_to_markdown_relative_signal_formatted() -> None:
     """Relative signal is formatted to three decimal places."""
     md = _rich_detection_result().to_markdown()
-    assert "1.500" in md   # snht at S1: 15.0 / 10.0
-    assert "0.800" in md   # buishand at S1: 8.0 / 10.0
+    assert "1.500" in md  # snht at S1: 15.0 / 10.0
+    assert "0.800" in md  # buishand at S1: 8.0 / 10.0
 
 
 @pytest.mark.unit

@@ -330,9 +330,11 @@ class Rucola:
         if cfg.progress:
             try:
                 from tqdm import tqdm  # noqa: PLC0415
+
                 _pbar = tqdm(total=6, desc="step 1/6", unit="step", leave=True)
             except ImportError:
                 import warnings  # noqa: PLC0415
+
                 warnings.warn("tqdm is not installed; install it with: pip install rucola[tqdm]", stacklevel=2)
 
         if cfg.max_distance_km is not None and "latitude" not in self.stations.columns:
@@ -615,11 +617,7 @@ class Rucola:
             _wide_cols = set(build_wide().columns)
             partial_wide = pl.DataFrame(
                 {"year": years_list[start_idx:]}
-                | {
-                    sid: states[sid].annual_current[start_idx:].to_list()
-                    for sid in candidate_ids
-                    if sid in _wide_cols
-                },
+                | {sid: states[sid].annual_current[start_idx:].to_list() for sid in candidate_ids if sid in _wide_cols},
             )
             nbrs6a = select_neighbors(
                 cid,
@@ -815,13 +813,7 @@ class Rucola:
     @staticmethod
     def _check_duplicate_dates(values: pl.DataFrame) -> None:
         """Raise if any station has two records for the same date."""
-        dup_ids = (
-            values.group_by("station_id", "date")
-            .len()
-            .filter(pl.col("len") > 1)["station_id"]
-            .unique()
-            .to_list()
-        )
+        dup_ids = values.group_by("station_id", "date").len().filter(pl.col("len") > 1)["station_id"].unique().to_list()
         if dup_ids:
             n = len(dup_ids)
             sample = sorted(dup_ids)[:_STATION_ID_SAMPLE_SIZE]

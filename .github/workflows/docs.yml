@@ -41,4 +41,6 @@ jobs:
 
       - name: Deploy release
         if: github.event_name == 'release'
-        run: uv run mike deploy --push ${{ github.event.release.tag_name }}
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
+        run: uv run mike deploy --push "$TAG_NAME"

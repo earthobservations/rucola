@@ -415,10 +415,7 @@ class _NotPredicate(BreakPredicate):
 
 def _edge_safe(tr: TestResult, min_years: int) -> bool:
     """Return True if break_year is at least min_years from either segment boundary."""
-    return (
-        tr.break_year - tr.segment_start >= min_years
-        and tr.segment_end - tr.break_year + 1 >= min_years
-    )
+    return tr.break_year - tr.segment_start >= min_years and tr.segment_end - tr.break_year + 1 >= min_years
 
 
 # ---------------------------------------------------------------------------
@@ -582,7 +579,8 @@ class Normalizer:
             return None, self._neutral(mode)
 
         significant = [
-            r for r in test_results
+            r
+            for r in test_results
             if r.is_significant and _edge_safe(r, min_edge) and r.relative_signal >= cfg.min_relative_signal
         ]
         n_total = len(test_results)

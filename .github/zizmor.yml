@@ -1,0 +1,11 @@
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        actions/*: ref-pin
+        astral-sh/*: ref-pin
+        codecov/*: ref-pin
+  artipacked:
+    ignore:
+      # mike needs persisted credentials to push to the gh-pages branch
+      - docs.yml

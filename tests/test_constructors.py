@@ -167,22 +167,26 @@ def test_from_csv_without_stations(values_df: pl.DataFrame, tmp_path: Path) -> N
 
 def test_duplicate_dates_raises() -> None:
     """Two records for the same station and date raise ValueError."""
-    values = pl.DataFrame({
-        "station_id": ["S1", "S1"],
-        "date": [date(2000, 1, 1), date(2000, 1, 1)],
-        "value": [10.0, 11.0],
-    })
+    values = pl.DataFrame(
+        {
+            "station_id": ["S1", "S1"],
+            "date": [date(2000, 1, 1), date(2000, 1, 1)],
+            "value": [10.0, 11.0],
+        }
+    )
     with pytest.raises(ValueError, match="duplicate dates"):
         rucola.Rucola(values)
 
 
 def test_multiple_parameters_raises() -> None:
     """Values with more than one parameter value raise ValueError."""
-    values = pl.DataFrame({
-        "station_id": ["S1", "S1"],
-        "date": [date(2000, 1, 1), date(2001, 1, 1)],
-        "value": [10.0, 11.0],
-        "parameter": ["precip", "temp"],
-    })
+    values = pl.DataFrame(
+        {
+            "station_id": ["S1", "S1"],
+            "date": [date(2000, 1, 1), date(2001, 1, 1)],
+            "value": [10.0, 11.0],
+            "parameter": ["precip", "temp"],
+        }
+    )
     with pytest.raises(ValueError, match="multiple parameters"):
         rucola.Rucola(values)
