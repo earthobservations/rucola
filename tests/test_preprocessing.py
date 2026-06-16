@@ -18,7 +18,9 @@ def test_winsorize_clips_extreme_outlier() -> None:
     """An extreme outlier is clipped to the P_out threshold."""
     values = pl.DataFrame({"station_id": ["S1"] * 10, "value": [100.0] * 9 + [_OUTLIER]})
     result = winsorize_outliers(values)
-    assert result["value"].max() < _OUTLIER
+    max_val = result["value"].max()
+    assert isinstance(max_val, float)
+    assert max_val < _OUTLIER
 
 
 def test_winsorize_preserves_normal_values() -> None:

@@ -4,12 +4,15 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, ClassVar, Literal, TypeVar
 
 from rucola._algorithms import CorrectionMode, apply_correction
 from rucola._results import CorrectionRecord, DetectionRecord, HomogenizationResult, StationResult
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+    from collections.abc import Set as AbstractSet
+
     from rucola._algorithms import NeighborInfo
     from rucola._homogeneity import TestResult
     from rucola._results import DetectionResult
@@ -64,11 +67,13 @@ class BreakInfo:
 
 _PRED_REGISTRY: dict[str, type[BreakPredicate]] = {}
 
+_PredT = TypeVar("_PredT", bound="BreakPredicate")
 
-def _register(name: str):  # noqa: ANN202
-    def _decorator(cls: type) -> type:
+
+def _register(name: str) -> Callable[[type[_PredT]], type[_PredT]]:
+    def _decorator(cls: type[_PredT]) -> type[_PredT]:
         _PRED_REGISTRY[name] = cls
-        cls._pred_type = name  # type: ignore[attr-defined]
+        cls._pred_type = name
         return cls
 
     return _decorator
@@ -85,6 +90,8 @@ class BreakPredicate(ABC):
     >>> p3 = ~StepIn({1, 2})
 
     """
+
+    _pred_type: ClassVar[str] = ""
 
     @abstractmethod
     def __call__(self, info: BreakInfo) -> bool:
@@ -164,7 +171,7 @@ class StationIn(BreakPredicate):
 
     """
 
-    station_ids: frozenset[str] = field(default_factory=frozenset)
+    station_ids: AbstractSet[str] = field(default_factory=frozenset)
 
     def __post_init__(self) -> None:
         if not isinstance(self.station_ids, frozenset):
@@ -193,7 +200,7 @@ class StepIn(BreakPredicate):
 
     """
 
-    steps: frozenset[int] = field(default_factory=frozenset)
+    steps: AbstractSet[int] = field(default_factory=frozenset)
 
     def __post_init__(self) -> None:
         if not isinstance(self.steps, frozenset):

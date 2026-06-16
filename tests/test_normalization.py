@@ -5,7 +5,7 @@ from __future__ import annotations
 import polars as pl
 import pytest
 
-from rucola._algorithms import NeighborInfo
+from rucola._algorithms import CorrectionMode, NeighborInfo
 from rucola._homogeneity import TestResult
 from rucola._normalization import (
     BreakInfo,
@@ -47,7 +47,7 @@ def _tr(*, sig: bool = True, break_year: int = 2005, rel: float = 2.0) -> TestRe
 def _det_result(
     test_results: list[TestResult],
     factor: float = 1.2,
-    mode: str = "ratio",
+    mode: CorrectionMode = "ratio",
     n_neighbors: int = 5,
 ) -> DetectionResult:
     years = pl.Series("year", list(range(1990, 2010)))

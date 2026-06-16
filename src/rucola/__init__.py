@@ -480,12 +480,14 @@ class Rucola:
                 is_inh = _meets_consensus(tr_list)
                 break_year = _resolve_break(tr_list)
                 neutral = 1.0 if cfg.mode == "ratio" else 0.0
-                f = compute_correction_factor(q, years, break_year, cfg.mode) if is_inh else neutral
-                if is_inh:
+                if is_inh and break_year is not None:
+                    f = compute_correction_factor(q, years, break_year, cfg.mode)
                     states[cid].annual_current = apply_correction(
                         states[cid].annual_current, years, break_year, f, cfg.mode
                     )
                     states[cid].corrections.append(CorrectionRecord(step=step, break_year=break_year, factor=f))
+                else:
+                    f = neutral
                 states[cid].detections_by_step[step] = DetectionRecord(
                     step=step,
                     break_year=break_year,
@@ -638,8 +640,8 @@ class Rucola:
                 inh_6a = _meets_consensus(tr_6a)
                 br_6a = _resolve_break(tr_6a)
                 neutral = 1.0 if cfg.mode == "ratio" else 0.0
-                f_6a = compute_correction_factor(q_6a, years[start_idx:], br_6a, cfg.mode) if inh_6a else neutral
-                if inh_6a:
+                if inh_6a and br_6a is not None:
+                    f_6a = compute_correction_factor(q_6a, years[start_idx:], br_6a, cfg.mode)
                     states[cid].annual_current = apply_correction(
                         states[cid].annual_current,
                         years,
@@ -648,6 +650,8 @@ class Rucola:
                         cfg.mode,
                     )
                     states[cid].corrections.append(CorrectionRecord(step=6, break_year=br_6a, factor=f_6a))
+                else:
+                    f_6a = neutral
                 states[cid].detections_by_step[61] = DetectionRecord(
                     step=61,
                     break_year=br_6a,
@@ -680,15 +684,8 @@ class Rucola:
             inh_6b = _meets_consensus(tr_6b)
             br_6b = _resolve_break(tr_6b)
             neutral = 1.0 if cfg.mode == "ratio" else 0.0
-            f_6b = compute_correction_factor(q_6b, years, br_6b, cfg.mode) if inh_6b else neutral
-            states[cid].detections_by_step[62] = DetectionRecord(
-                step=62,
-                break_year=br_6b,
-                factor=f_6b,
-                test_results=tr_6b,
-                was_applied=inh_6b,
-            )
-            if inh_6b:
+            if inh_6b and br_6b is not None:
+                f_6b = compute_correction_factor(q_6b, years, br_6b, cfg.mode)
                 states[cid].annual_current = apply_correction(
                     states[cid].annual_current,
                     years,
@@ -697,6 +694,15 @@ class Rucola:
                     cfg.mode,
                 )
                 states[cid].corrections.append(CorrectionRecord(step=6, break_year=br_6b, factor=f_6b))
+            else:
+                f_6b = neutral
+            states[cid].detections_by_step[62] = DetectionRecord(
+                step=62,
+                break_year=br_6b,
+                factor=f_6b,
+                test_results=tr_6b,
+                was_applied=inh_6b,
+            )
 
             # --- 6c: re-test the doubly-corrected series — González-Rouco (2001) §3.b.
             # HCC6 means "homogeneous after two corrections"; ICC6 means a residual
