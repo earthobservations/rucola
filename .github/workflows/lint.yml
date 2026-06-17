@@ -34,6 +34,7 @@ jobs:
               - 'src/**'
               - 'tests/**'
               - 'pyproject.toml'
+              - 'uv.lock'
 
   lint:
     needs: filter
