@@ -6,6 +6,7 @@ rules:
         astral-sh/*: ref-pin
         codecov/*: ref-pin
         dorny/*: ref-pin
+        github/*: ref-pin
   artipacked:
     ignore:
       # mike needs persisted credentials to push to the gh-pages branch
