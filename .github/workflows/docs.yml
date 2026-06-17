@@ -43,4 +43,7 @@ jobs:
         if: github.event_name == 'release'
         env:
           TAG_NAME: ${{ github.event.release.tag_name }}
-        run: uv run mike deploy --push "$TAG_NAME"
+        run: uv run mike deploy --push --update-aliases "$TAG_NAME" latest
+
+      - name: Set "latest" as the default version
+        run: uv run mike set-default --push latest
