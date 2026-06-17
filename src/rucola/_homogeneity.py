@@ -364,7 +364,9 @@ class SNHTTest(HomogenizationTest):
 
         t0 = max(t_vals)
         m_opt = t_vals.index(t0) + 1
-        break_year = y_vals[m_opt]
+        # m_opt is the split index m (1..n-1); first post-break year is y_vals[m_opt].
+        post_break_idx = m_opt
+        break_year = y_vals[post_break_idx] if post_break_idx < n else y_vals[-1]
 
         return TestResult(
             test_name=self.name,
