@@ -45,7 +45,7 @@ jobs:
           python-version: ${{ env.PYTHON }}
 
       - name: Install project
-        run: uv sync --group test
+        run: uv sync --group test --extra duckdb
 
       - name: Run tests
         run: uv run poe test

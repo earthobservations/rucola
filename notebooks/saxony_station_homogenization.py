@@ -62,8 +62,19 @@ def _():
     from wetterdienst.provider.dwd.observation import DwdObservationRequest
 
     return (
-        BreakInfo, BreakPredicate, BuishandTest, DwdObservationRequest, EasterlingPetersonTest,
-        NormalizationConfig, PettittTest, RunConfig, SNHTTest, StarsTest, WorsleyTest, pl, rucola,
+        BreakInfo,
+        BreakPredicate,
+        BuishandTest,
+        DwdObservationRequest,
+        EasterlingPetersonTest,
+        NormalizationConfig,
+        PettittTest,
+        RunConfig,
+        SNHTTest,
+        StarsTest,
+        WorsleyTest,
+        pl,
+        rucola,
     )
 
 
@@ -136,12 +147,14 @@ def _(DwdObservationRequest, mo, parameter_picker, pl):
     _frames = []
     with mo.status.progress_bar(total=len(stations), title="Fetching station data …") as _pbar:
         for _r in _station_result.values.query():
-            _frames.append(_r.df.select(
-                pl.col("station_id"),
-                pl.col("date").dt.replace_time_zone(None).cast(pl.Date).alias("date"),
-                pl.col("value"),
-                pl.col("parameter"),
-            ))
+            _frames.append(
+                _r.df.select(
+                    pl.col("station_id"),
+                    pl.col("date").dt.replace_time_zone(None).cast(pl.Date).alias("date"),
+                    pl.col("value"),
+                    pl.col("parameter"),
+                )
+            )
             _pbar.update(subtitle=_r.df["station_id"][0])
     values = pl.concat(_frames).sort("station_id", "date")
 
@@ -192,9 +205,7 @@ def _(DwdObservationRequest, mo, parameter_picker, stations):
             _pbar.update(subtitle=_sid)
 
     mo.callout(
-        mo.md(
-            f"Loaded history for **{_n_with_records}** of **{len(_sids)}** stations"
-        ),
+        mo.md(f"Loaded history for **{_n_with_records}** of **{len(_sids)}** stations"),
         kind="success",
     )
     return (station_histories,)
@@ -202,8 +213,21 @@ def _(DwdObservationRequest, mo, parameter_picker, stations):
 
 @app.cell
 def _(
-    BuishandTest, EasterlingPetersonTest, PettittTest, RunConfig, SNHTTest, StarsTest,
-    WorsleyTest, consensus_picker, mo, parameter_picker, pl, rucola, stations, test_picker, values,
+    BuishandTest,
+    EasterlingPetersonTest,
+    PettittTest,
+    RunConfig,
+    SNHTTest,
+    StarsTest,
+    WorsleyTest,
+    consensus_picker,
+    mo,
+    parameter_picker,
+    pl,
+    rucola,
+    stations,
+    test_picker,
+    values,
 ):
     _MODE = {
         "precipitation_height": "ratio",
@@ -222,12 +246,14 @@ def _(
 
     with mo.status.progress_bar(total=6, title="step 1/6 — all stations vs all") as _pbar:
         _r = rucola.Rucola.from_polars(values, stations, parameter=_param)
-        detection = _r.run(RunConfig(
-            tests=_tests,
-            mode=_MODE[_param],
-            run_consensus=consensus_picker.value,
-            on_step=lambda _, desc: _pbar.update(title=desc),
-        ))
+        detection = _r.run(
+            RunConfig(
+                tests=_tests,
+                mode=_MODE[_param],
+                run_consensus=consensus_picker.value,
+                on_step=lambda _, desc: _pbar.update(title=desc),
+            )
+        )
 
     _s = detection.summary
     _grp = pl.col("group")
@@ -339,11 +365,8 @@ def _(detection, station_histories):
     _MATCH_WINDOW = 3
     history_matches: dict[str, set[int]] = {
         sid: {
-            y for y in (
-                rec.break_year
-                for rec in det.detections_by_step.values()
-                if rec.break_year is not None
-            )
+            y
+            for y in (rec.break_year for rec in det.detections_by_step.values() if rec.break_year is not None)
             if any(abs(y - ey) <= _MATCH_WINDOW for ey in station_histories.get(sid, set()))
         }
         for sid, det in detection.station_detections.items()
@@ -426,10 +449,12 @@ def _(detection, group_picker, history_matches, mo):
         value=_first_key,
         label="Inspect station",
     )
-    mo.vstack([
-        station_picker,
-        mo.md("*★ = break year confirmed in DWD station records (±3 yr)*"),
-    ])
+    mo.vstack(
+        [
+            station_picker,
+            mo.md("*★ = break year confirmed in DWD station records (±3 yr)*"),
+        ]
+    )
     return (station_picker,)
 
 
@@ -497,6 +522,7 @@ def _(DwdObservationRequest, detection, mo, parameter_picker, pl, station_picker
 
         def _match(event_year: int | None):
             from datetime import date
+
             if event_year is None or not _break_years:
                 return None
             candidates = [y for y in _break_years if abs(y - event_year) <= _MATCH_WINDOW]
@@ -583,18 +609,15 @@ def _(DwdObservationRequest, detection, mo, parameter_picker, pl, station_picker
                 _callout_kind = "warn"
             else:
                 _callout_text = (
-                    f"None of the **{_n_total}** detected break(s)"
-                    f" match a station history event (±{_MATCH_WINDOW} yr)."
+                    f"None of the **{_n_total}** detected break(s) match a station history event (±{_MATCH_WINDOW} yr)."
                 )
                 _callout_kind = "danger"
 
             _matched_years = {r["break_match"].year for r in _all_rows if r["break_match"] is not None}
             _break_years_str = (
-                ", ".join(
-                    f"{y}★" if y in _matched_years else str(y)
-                    for y in sorted(_break_years)
-                )
-                if _break_years else "—"
+                ", ".join(f"{y}★" if y in _matched_years else str(y) for y in sorted(_break_years))
+                if _break_years
+                else "—"
             )
             _out = mo.vstack(
                 [
@@ -901,17 +924,20 @@ def _(chart_station_picker, mo, parameter_picker, pl, result, show_trendlines):
         _y = alt.Y("value:Q", title=_y_label)
 
         if _corrected:
-            _df = pl.DataFrame({
-                "year": _years,
-                "Original": _sr.annual_original.cast(pl.Float64).to_list(),
-                "Homogenized": _sr.annual_corrected.cast(pl.Float64).to_list(),
-            }).unpivot(index="year", variable_name="series", value_name="value")
+            _df = pl.DataFrame(
+                {
+                    "year": _years,
+                    "Original": _sr.annual_original.cast(pl.Float64).to_list(),
+                    "Homogenized": _sr.annual_corrected.cast(pl.Float64).to_list(),
+                }
+            ).unpivot(index="year", variable_name="series", value_name="value")
 
             _lines = (
                 alt.Chart(_df)
                 .mark_line()
                 .encode(
-                    x=_x, y=_y,
+                    x=_x,
+                    y=_y,
                     color=alt.Color(
                         "series:N",
                         scale=alt.Scale(
@@ -920,19 +946,17 @@ def _(chart_station_picker, mo, parameter_picker, pl, result, show_trendlines):
                         ),
                         legend=alt.Legend(title=None, orient="top-left"),
                     ),
-                    strokeWidth=alt.condition(
-                        alt.datum.series == "Homogenized", alt.value(2), alt.value(1)
-                    ),
-                    opacity=alt.condition(
-                        alt.datum.series == "Homogenized", alt.value(1.0), alt.value(0.7)
-                    ),
+                    strokeWidth=alt.condition(alt.datum.series == "Homogenized", alt.value(2), alt.value(1)),
+                    opacity=alt.condition(alt.datum.series == "Homogenized", alt.value(1.0), alt.value(0.7)),
                 )
             )
 
-            _break_df = pl.DataFrame({
-                "break_year": [c.break_year for c in _valid_corrections],
-                "factor": [f"×{c.factor:.3f}" for c in _valid_corrections],
-            })
+            _break_df = pl.DataFrame(
+                {
+                    "break_year": [c.break_year for c in _valid_corrections],
+                    "factor": [f"×{c.factor:.3f}" for c in _valid_corrections],
+                }
+            )
             _rules = (
                 alt.Chart(_break_df)
                 .mark_rule(color="#d62728", strokeDash=[4, 3], strokeWidth=1.5)
@@ -949,7 +973,8 @@ def _(chart_station_picker, mo, parameter_picker, pl, result, show_trendlines):
                     .transform_regression("year", "value", groupby=["series"])
                     .mark_line(strokeDash=[6, 3], strokeWidth=1.5)
                     .encode(
-                        x=_x, y=_y,
+                        x=_x,
+                        y=_y,
                         color=alt.Color(
                             "series:N",
                             scale=alt.Scale(
@@ -958,9 +983,7 @@ def _(chart_station_picker, mo, parameter_picker, pl, result, show_trendlines):
                             ),
                             legend=None,
                         ),
-                        opacity=alt.condition(
-                            alt.datum.series == "Homogenized", alt.value(1.0), alt.value(0.7)
-                        ),
+                        opacity=alt.condition(alt.datum.series == "Homogenized", alt.value(1.0), alt.value(0.7)),
                     )
                 )
                 _spec = _lines + _trends + _rules + _labels
@@ -968,15 +991,13 @@ def _(chart_station_picker, mo, parameter_picker, pl, result, show_trendlines):
                 _spec = _lines + _rules + _labels
 
         else:
-            _df = pl.DataFrame({
-                "year": _years,
-                "value": _sr.annual_original.cast(pl.Float64).to_list(),
-            })
-            _line = (
-                alt.Chart(_df)
-                .mark_line(color="#1f77b4", strokeWidth=2)
-                .encode(x=_x, y=_y)
+            _df = pl.DataFrame(
+                {
+                    "year": _years,
+                    "value": _sr.annual_original.cast(pl.Float64).to_list(),
+                }
             )
+            _line = alt.Chart(_df).mark_line(color="#1f77b4", strokeWidth=2).encode(x=_x, y=_y)
             if show_trendlines.value:
                 _trend = (
                     alt.Chart(_df)

@@ -5,7 +5,7 @@ from __future__ import annotations
 import polars as pl
 import pytest
 
-from rucola._algorithms import NeighborInfo
+from rucola._algorithms import CorrectionMode, NeighborInfo
 from rucola._homogeneity import TestResult
 from rucola._normalization import (
     BreakInfo,
@@ -47,14 +47,13 @@ def _tr(*, sig: bool = True, break_year: int = 2005, rel: float = 2.0) -> TestRe
 def _det_result(
     test_results: list[TestResult],
     factor: float = 1.2,
-    mode: str = "ratio",
+    mode: CorrectionMode = "ratio",
     n_neighbors: int = 5,
 ) -> DetectionResult:
     years = pl.Series("year", list(range(1990, 2010)))
     rec = DetectionRecord(step=1, break_year=2005, factor=factor, test_results=test_results, was_applied=True)
     nbrs = [
-        NeighborInfo(station_id=f"N{i}", distance_km=None, correlation=0.8, weight=0.64)
-        for i in range(n_neighbors)
+        NeighborInfo(station_id=f"N{i}", distance_km=None, correlation=0.8, weight=0.64) for i in range(n_neighbors)
     ]
     sd = StationDetection(
         station_id="S1",
@@ -511,9 +510,7 @@ def _tr_edge(*, break_year: int, segment_start: int, segment_end: int, sig: bool
 
 def _det_result_edge(tr: TestResult) -> DetectionResult:
     years = pl.Series("year", list(range(tr.segment_start, tr.segment_end + 1)))
-    rec = DetectionRecord(
-        step=1, break_year=tr.break_year, factor=1.2, test_results=[tr], was_applied=True
-    )
+    rec = DetectionRecord(step=1, break_year=tr.break_year, factor=1.2, test_results=[tr], was_applied=True)
     nbrs = [NeighborInfo(station_id="N0", distance_km=None, correlation=0.8, weight=0.64)]
     sd = StationDetection(
         station_id="S1",

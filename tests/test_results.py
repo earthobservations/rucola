@@ -19,6 +19,7 @@ from rucola._results import (
 
 if TYPE_CHECKING:
     import rucola
+    from rucola._algorithms import GroupLabel
 
 pytestmark = pytest.mark.slow
 
@@ -231,7 +232,7 @@ def _tr(*, sig: bool = True, break_year: int = 2005, rel: float = 2.0) -> TestRe
 
 def _make_detection_result(
     station_id: str = "X",
-    group: str = "HC4",
+    group: GroupLabel = "HC4",
     detections_by_step: dict | None = None,
     corrections: list | None = None,
     parameter: str = "my_param",

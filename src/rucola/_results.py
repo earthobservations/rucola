@@ -296,8 +296,12 @@ class StationDetection:
             "detections_by_step": {str(k): v.to_dict() for k, v in self.detections_by_step.items()},
             "neighbors_by_step": {
                 str(k): [
-                    {"station_id": n.station_id, "distance_km": n.distance_km,
-                     "correlation": n.correlation, "weight": n.weight}
+                    {
+                        "station_id": n.station_id,
+                        "distance_km": n.distance_km,
+                        "correlation": n.correlation,
+                        "weight": n.weight,
+                    }
                     for n in v
                 ]
                 for k, v in self.neighbors_by_step.items()

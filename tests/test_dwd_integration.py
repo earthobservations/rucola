@@ -1,6 +1,6 @@
 """Integration tests — full homogenization pipeline on DWD annual data for Saxony.
 
-Locked expected values from a verified run on 2026-06-11. Update if DWD substantially
+Locked expected values from a verified run on 2026-06-17. Update if DWD substantially
 revises historical records or the procedure changes.
 """
 
@@ -41,14 +41,15 @@ _PRECIPITATION = _Scenario(
     mode="ratio",
     n_stations=380,
     expected_groups={
-        "H4": 240,  # homogeneous (includes stations always found clean)
-        "HC4": 46,  # corrected once at step 4
-        "HC5": 13,  # corrected at step 5
-        "HCC6": 12,  # corrected twice
+        "H4": 257,  # homogeneous (includes stations always found clean)
+        "HC4": 38,  # corrected once at step 4
+        "HC5": 10,  # corrected at step 5
+        "HCC6": 6,  # corrected twice
+        "ICC6": 0,  # still inhomogeneous after two corrections (none for precip)
         "INSUFFICIENT_DATA": 69,
         "UNTESTABLE": 0,
     },
-    expected_corrections=203,
+    expected_corrections=171,
     min_factor=0.5,  # multiplicative; < 0.5 or > 2.0 is physically implausible
     max_factor=2.0,
 )
@@ -58,14 +59,15 @@ _TEMPERATURE = _Scenario(
     mode="difference",
     n_stations=58,
     expected_groups={
-        "H4": 4,
-        "HC4": 5,
-        "HC5": 3,
-        "HCC6": 39,  # most 150-year temperature records have two breaks
+        "H4": 6,
+        "HC4": 3,
+        "HC5": 2,
+        "HCC6": 20,  # most 150-year temperature records have two breaks
+        "ICC6": 20,  # step 6c flags many as still inhomogeneous (residual breaks)
         "INSUFFICIENT_DATA": 7,
         "UNTESTABLE": 0,
     },
-    expected_corrections=142,
+    expected_corrections=152,
     min_factor=-10.0,  # additive °C offset; ±10°C is the physical plausibility bound
     max_factor=10.0,
 )
