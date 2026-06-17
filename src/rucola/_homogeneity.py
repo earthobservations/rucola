@@ -291,8 +291,16 @@ class HomogenizationTest(ABC):
 
 
 class SNHTTest(HomogenizationTest):
-    """Standard Normal Homogeneity Test (Alexandersson 1986).
+    r"""Standard Normal Homogeneity Test (Alexandersson 1986).
 
+    Scans every candidate split *m* and maximises a likelihood-ratio statistic
+    over the standardised series $z_i = (q_i - \bar{q}) / \hat{\sigma}$:
+
+    $$T_0 = \max_{1 \le m < n} \left[\, m\, \bar{z}_1^{\,2}
+        + (n - m)\, \bar{z}_2^{\,2} \,\right]$$
+
+    where $\bar{z}_1 = \tfrac{1}{m}\sum_{i=1}^{m} z_i$ and
+    $\bar{z}_2 = \tfrac{1}{n-m}\sum_{i=m+1}^{n} z_i$ are the segment means.
     Uses tabulated critical values from Alexandersson & Moberg (1997) at
     alpha ∈ {0.01, 0.05, 0.10}.
     """
@@ -373,10 +381,15 @@ class SNHTTest(HomogenizationTest):
 
 
 class BuishandTest(HomogenizationTest):
-    """Buishand range test (Buishand 1982).
+    r"""Buishand range test (Buishand 1982).
 
-    Statistic R = (max S_k − min S_k) / (√n · σ) where S_k is the
-    cumulative deviation from the mean and σ is the population std.
+    Built on cumulative deviations $S_k = \sum_{i=1}^{k}(q_i - \bar{q})$.
+    Under the null these form a bridge anchored at $S_0 = S_n = 0$; a break
+    pulls the bridge away from zero, inflating its range:
+
+    $$R = \frac{\max_k S_k - \min_k S_k}{\sqrt{n}\, \hat{\sigma}}$$
+
+    The break is located at $k^\star = \arg\max_k |S_k|$.
     Uses tabulated critical values at alpha ∈ {0.01, 0.05, 0.10}.
     """
 
@@ -454,11 +467,19 @@ class BuishandTest(HomogenizationTest):
 
 
 class PettittTest(HomogenizationTest):
-    """Pettitt test (Pettitt 1979).
+    r"""Pettitt test (Pettitt 1979).
 
-    Non-parametric test based on the Mann-Whitney statistic.
-    K = max_t |U_{t,n}|.  P-value approximated analytically:
-    p ≈ 2 exp(−6K² / (n³ + n²)).  Supports any alpha > 0.
+    Non-parametric rank test based on the Mann–Whitney statistic.  For each
+    candidate split *t* it counts whether values after the split tend to be
+    larger or smaller than values before:
+
+    $$U_{t,n} = \sum_{i=1}^{t} \sum_{j=t+1}^{n} \operatorname{sgn}(q_j - q_i),
+        \qquad K = \max_{1 \le t < n} |U_{t,n}|$$
+
+    Because it uses signs rather than magnitudes, the test is robust to
+    outliers and to non-normal distributions.  The p-value is approximated
+    analytically as $p \approx 2 \exp\!\bigl(-6K^2 / (n^3 + n^2)\bigr)$,
+    so any $\alpha > 0$ is supported.
     """
 
     @property
@@ -532,13 +553,18 @@ def _worsley_crit(n: int, alpha: float) -> float:
 
 
 class WorsleyTest(HomogenizationTest):
-    """Worsley likelihood ratio test (Worsley 1979).
+    r"""Worsley likelihood ratio test (Worsley 1979).
 
-    Maximum standardized two-sample t-statistic over all possible change points:
-    W = max_{1≤k≤n−1} | sqrt(k(n−k)/n) · (x̄_before − x̄_after) / s_pooled |
+    Maximum standardised two-sample t-statistic over all candidate change
+    points $k$:
 
+    $$W = \max_{1 \le k < n} \left| \sqrt{\frac{k\,(n-k)}{n}}
+        \cdot \frac{\bar{q}_{1:k} - \bar{q}_{k+1:n}}{s_p} \right|$$
+
+    where $s_p$ is the pooled standard deviation of the two segments.
     Critical values are computed analytically via the Bonferroni approximation
-    and support any alpha > 0.
+    $c = \Phi^{-1}\!\bigl(1 - \alpha / (2(n-1))\bigr)$ and support any
+    $\alpha > 0$.
     """
 
     @property
@@ -613,14 +639,21 @@ class WorsleyTest(HomogenizationTest):
 
 
 class EasterlingPetersonTest(HomogenizationTest):
-    """Easterling–Peterson two-phase regression test (Easterling & Peterson 1995).
+    r"""Easterling–Peterson two-phase regression test (Easterling & Peterson 1995).
 
-    Fits the model q_i = a + b·t_i + c·I(i > k) + ε for each candidate break k.
-    The step change c is tested via its OLS t-statistic; the maximum |t_k| over
-    all k is the test statistic. Unlike mean-shift tests, the linear trend term
-    b prevents trend from being mistaken for a break — useful for temperature.
+    For each candidate break $k$, fits a linear trend plus a step:
 
-    Critical values use the same Bonferroni normal approximation as WorsleyTest.
+    $$q_i = a + b\, t_i + c \cdot \mathbf{1}_{i > k} + \varepsilon_i$$
+
+    The step change $c$ is tested via its OLS t-statistic $t_k(c)$, and the
+    test statistic is the maximum absolute value over all candidate breaks:
+
+    $$T = \max_{1 \le k < n} |t_k(c)|$$
+
+    Unlike mean-shift tests, the linear trend term $b$ prevents a real trend
+    from being mistaken for a break — useful for temperature series.
+    Critical values use the same Bonferroni normal approximation as
+    [`WorsleyTest`][rucola.WorsleyTest].
     """
 
     @property
@@ -731,22 +764,18 @@ class StarsTest(HomogenizationTest):
     Variance is estimated from the mean-square successive differences (MSSD),
     which is robust to the very breaks being detected:
 
-    .. math::
+    $$\hat{\sigma}^2 = \frac{1}{2(n-1)} \sum_{t=1}^{n-1}(x_{t+1} - x_t)^2$$
 
-        \\hat{\\sigma}^2 = \\frac{1}{2(n-1)} \\sum_{t=1}^{n-1}(x_{t+1} - x_t)^2
-
-    The minimum detectable mean shift is :math:`\\delta = t_{\\text{crit}} \\cdot
-    \\hat{\\sigma} \\sqrt{2/l}`, where :math:`t_{\\text{crit}}` is the two-tailed
-    t-distribution critical value for :math:`\\nu = 2(l-1)` degrees of freedom.
+    The minimum detectable mean shift is $\delta = t_{\text{crit}} \cdot
+    \hat{\sigma} \sqrt{2/l}$, where $t_{\text{crit}}$ is the two-tailed
+    t-distribution critical value for $\nu = 2(l-1)$ degrees of freedom.
 
     A shift at year *j* is confirmed when the RSI
 
-    .. math::
+    $$\text{RSI}(k) = \sum_{t=j}^{k}
+        \frac{x_t - (\bar{x}_{\text{prev}} \pm \delta)}{\hat{\sigma}\, l}$$
 
-        \\text{RSI}(k) = \\sum_{t=j}^{k}
-            \\frac{x_t - (\\bar{x}_{\\text{prev}} \\pm \\delta)}{\\hat{\\sigma}\\, l}
-
-    does not change sign for all :math:`k \\in [j,\\, j+l-1]`.  If multiple
+    does not change sign for all $k \in [j,\, j+l-1]$.  If multiple
     shifts are confirmed, the one with the largest t-statistic is returned as
     the primary break year.
 
@@ -754,7 +783,7 @@ class StarsTest(HomogenizationTest):
     ----------
     l :
         Cut-off length in years — the minimum regime duration and the RSI
-        confirmation window.  Sets :math:`\\nu = 2(l-1)` degrees of freedom
+        confirmation window.  Sets $\nu = 2(l-1)$ degrees of freedom
         for the t-test.  Typical values for annual climate data: 10–15.
     alpha :
         Significance level for the t-test.  Supported: ``{0.01, 0.05, 0.10}``.

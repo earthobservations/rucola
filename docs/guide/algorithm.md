@@ -123,6 +123,27 @@ The `NormalizationConfig` controls:
 - **min_correction_magnitude** — ignore corrections below this threshold
 - **max_corrections_per_station** — cap on the number of breaks applied
 
+### Step size estimation
+
+The correction factor $f$ is estimated from the Q-series itself, by comparing
+its mean on either side of the detected break:
+
+$$\bar{Q}_{\text{before}} = \frac{1}{n_b} \sum_{t < t_{\text{break}}} Q_t,
+\qquad
+\bar{Q}_{\text{after}} = \frac{1}{n_a} \sum_{t \ge t_{\text{break}}} Q_t$$
+
+The form of $f$ depends on the mode (González-Rouco et al. 2001, Eq. 5):
+
+$$f_{\text{ratio}} = \frac{\bar{Q}_{\text{after}}}{\bar{Q}_{\text{before}}},
+\qquad
+f_{\text{diff}} = \bar{Q}_{\text{after}} - \bar{Q}_{\text{before}}$$
+
+Neutral values are $f_{\text{ratio}} = 1$ and $f_{\text{diff}} = 0$ (no
+correction).  Because the Q-series already cancels the shared climate signal
+against the reference pool, $f$ isolates the station-specific shift.
+
+### Applying the correction
+
 **Ratio correction** (precipitation): multiply all values *before* the break
 by the inverse of the ratio factor:
 
