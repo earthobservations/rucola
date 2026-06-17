@@ -23,11 +23,11 @@ jobs:
     outputs:
       src: ${{ steps.filter.outputs.src }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
@@ -46,11 +46,11 @@ jobs:
       contents: read
     steps:
       - name: Acquire sources
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
 
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ env.PYTHON }}
 
@@ -62,7 +62,7 @@ jobs:
 
       - name: Upload unit coverage to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage-unit.xml
@@ -72,7 +72,7 @@ jobs:
 
       - name: Upload unit test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./junit-unit.xml
@@ -84,7 +84,7 @@ jobs:
 
       - name: Upload integration coverage to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage-integration.xml
@@ -94,7 +94,7 @@ jobs:
 
       - name: Upload integration test results to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./junit-integration.xml
