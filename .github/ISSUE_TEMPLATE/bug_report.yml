@@ -1,0 +1,46 @@
+name: Bug report
+description: Something behaves unexpectedly or produces wrong results.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please fill in as much detail as you can. For algorithm discrepancies, include the station data or a minimal reproducer if possible.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the unexpected behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Minimal reproducer
+      description: Code or steps to reproduce the issue.
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Output of `uv run python -c "import rucola; print(rucola.__version__)"` and your Python version.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Stack traces, links to data, or anything else that might help.
