@@ -35,7 +35,7 @@ def test_missing_values_column(stations_df: pl.DataFrame) -> None:
 def test_station_coverage_check(values_df: pl.DataFrame, stations_df: pl.DataFrame) -> None:
     """Station ID in values without a matching stations entry raises ValueError."""
     extra = values_df.vstack(
-        pl.DataFrame({"station_id": ["GHOST"], "date": [date(2000, 1, 1)], "value": [1.0], "parameter": ["p"]})
+        pl.DataFrame({"station_id": ["GHOST"], "date": [date(2000, 1, 1)], "value": [1.0], "parameter": ["precip"]})
     )
     with pytest.raises(ValueError, match="GHOST"):
         rucola.Rucola(extra, stations_df)
