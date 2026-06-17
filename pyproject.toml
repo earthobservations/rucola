@@ -118,8 +118,17 @@ cmd = "uv run --group docs mkdocs serve"
 [tool.poe.tasks.docs-build]
 cmd = "uv run --group docs mkdocs build"
 
+[tool.poe.tasks.coverage-unit]
+cmd = "uv run --group test pytest -m 'not integration' --cov --cov-report=xml:coverage-unit.xml --junitxml=junit-unit.xml -o junit_family=legacy"
+
+[tool.poe.tasks.coverage-integration]
+cmd = "uv run --group test pytest -m integration --cov --cov-report=xml:coverage-integration.xml --junitxml=junit-integration.xml -o junit_family=legacy"
+
 [tool.poe.tasks.coverage]
-cmd = "uv run --group test pytest --cov-report=xml"
+sequence = [
+    { ref = "coverage-unit" },
+    { ref = "coverage-integration" },
+]
 
 [tool.poe.tasks.audit]
 cmd = "uv audit"

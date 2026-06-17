@@ -36,13 +36,46 @@ jobs:
       - name: Install project
         run: uv sync --group test --extra duckdb
 
-      - name: Run tests with coverage
-        run: uv run poe coverage
+      - name: Run unit tests with coverage
+        run: uv run poe coverage-unit
 
-      - name: Upload coverage to Codecov
+      - name: Upload unit coverage to Codecov
+        if: ${{ !cancelled() }}
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./coverage.xml
+          files: ./coverage-unit.xml
           env_vars: OS,PYTHON
+          flags: unit
           fail_ci_if_error: false
+
+      - name: Upload unit test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./junit-unit.xml
+          flags: unit
+          report_type: test_results
+
+      - name: Run integration tests with coverage
+        run: uv run poe coverage-integration
+
+      - name: Upload integration coverage to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage-integration.xml
+          env_vars: OS,PYTHON
+          flags: integration
+          fail_ci_if_error: false
+
+      - name: Upload integration test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./junit-integration.xml
+          flags: integration
+          report_type: test_results
