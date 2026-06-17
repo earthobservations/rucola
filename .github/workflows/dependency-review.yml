@@ -3,12 +3,32 @@ name: Dependency Review
 on:
   pull_request: ~
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
-  dependency-review:
+  filter:
     runs-on: ubuntu-latest
+    outputs:
+      deps: ${{ steps.filter.outputs.deps }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            deps:
+              - 'pyproject.toml'
+              - 'uv.lock'
+
+  dependency-review:
+    needs: filter
+    if: needs.filter.outputs.deps == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Acquire sources
         uses: actions/checkout@v4

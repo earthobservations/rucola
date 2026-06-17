@@ -5,6 +5,7 @@ rules:
         actions/*: ref-pin
         astral-sh/*: ref-pin
         codecov/*: ref-pin
+        dorny/*: ref-pin
   artipacked:
     ignore:
       # mike needs persisted credentials to push to the gh-pages branch
