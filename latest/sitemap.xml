@@ -2,46 +2,46 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://earthobservations.github.io/rucola/latest/</loc>
-         <lastmod>2026-06-16</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://earthobservations.github.io/rucola/latest/changelog/</loc>
-         <lastmod>2026-06-16</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://earthobservations.github.io/rucola/latest/contributing/</loc>
-         <lastmod>2026-06-16</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://earthobservations.github.io/rucola/latest/api/normalization/</loc>
-         <lastmod>2026-06-16</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://earthobservations.github.io/rucola/latest/api/preprocessing/</loc>
-         <lastmod>2026-06-16</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://earthobservations.github.io/rucola/latest/api/results/</loc>
-         <lastmod>2026-06-16</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://earthobservations.github.io/rucola/latest/api/rucola/</loc>
-         <lastmod>2026-06-16</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://earthobservations.github.io/rucola/latest/api/tests/</loc>
-         <lastmod>2026-06-16</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://earthobservations.github.io/rucola/latest/guide/algorithm/</loc>
-         <lastmod>2026-06-16</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://earthobservations.github.io/rucola/latest/guide/normalization/</loc>
-         <lastmod>2026-06-16</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
     <url>
          <loc>https://earthobservations.github.io/rucola/latest/guide/quickstart/</loc>
-         <lastmod>2026-06-16</lastmod>
+         <lastmod>2026-06-17</lastmod>
     </url>
 </urlset>
