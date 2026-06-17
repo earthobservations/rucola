@@ -588,6 +588,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Correction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-size-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step size estimation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#applying-the-correction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Applying the correction
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -979,6 +1007,34 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Correction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-size-estimation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step size estimation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#applying-the-correction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Applying the correction
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1185,6 +1241,20 @@ The <code>NormalizationConfig</code> controls:</p>
 <li><strong>min_correction_magnitude</strong> — ignore corrections below this threshold</li>
 <li><strong>max_corrections_per_station</strong> — cap on the number of breaks applied</li>
 </ul>
+<h3 id="step-size-estimation">Step size estimation<a class="headerlink" href="#step-size-estimation" title="Permanent link">&para;</a></h3>
+<p>The correction factor <span class="arithmatex">\(f\)</span> is estimated from the Q-series itself, by comparing
+its mean on either side of the detected break:</p>
+<div class="arithmatex">\[\bar{Q}_{\text{before}} = \frac{1}{n_b} \sum_{t &lt; t_{\text{break}}} Q_t,
+\qquad
+\bar{Q}_{\text{after}} = \frac{1}{n_a} \sum_{t \ge t_{\text{break}}} Q_t\]</div>
+<p>The form of <span class="arithmatex">\(f\)</span> depends on the mode (González-Rouco et al. 2001, Eq. 5):</p>
+<div class="arithmatex">\[f_{\text{ratio}} = \frac{\bar{Q}_{\text{after}}}{\bar{Q}_{\text{before}}},
+\qquad
+f_{\text{diff}} = \bar{Q}_{\text{after}} - \bar{Q}_{\text{before}}\]</div>
+<p>Neutral values are <span class="arithmatex">\(f_{\text{ratio}} = 1\)</span> and <span class="arithmatex">\(f_{\text{diff}} = 0\)</span> (no
+correction).  Because the Q-series already cancels the shared climate signal
+against the reference pool, <span class="arithmatex">\(f\)</span> isolates the station-specific shift.</p>
+<h3 id="applying-the-correction">Applying the correction<a class="headerlink" href="#applying-the-correction" title="Permanent link">&para;</a></h3>
 <p><strong>Ratio correction</strong> (precipitation): multiply all values <em>before</em> the break
 by the inverse of the ratio factor:</p>
 <div class="arithmatex">\[P_t^{\text{corr}} = P_t \cdot f^{-1}, \quad t &lt; t_{\text{break}}\]</div>
