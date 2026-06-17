@@ -547,7 +547,7 @@ def _worsley_crit(n: int, alpha: float) -> float:
     P(W_n > c) ≈ 2(n−1)(1−Φ(c)), so c = Φ⁻¹(1 − α / (2(n−1))).
     """
     if n <= 2:  # noqa: PLR2004
-        return float("inf")
+        return 0.0
     p = 1.0 - alpha / (2.0 * (n - 1))
     return _NormalDist().inv_cdf(p)
 
