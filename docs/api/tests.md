@@ -9,3 +9,5 @@
 ::: rucola.WorsleyTest
 
 ::: rucola.EasterlingPetersonTest
+
+::: rucola.StarsTest
