@@ -803,14 +803,24 @@ class StarsTest(HomogenizationTest):
 
     def __init__(
         self,
-        l: int = 10,  # noqa: E741
+        cutoff_length: int = 10,
         alpha: float = 0.05,
         min_years_from_end: int = 5,
         min_relative_signal: float = 1.0,
+        **kwargs,
     ) -> None:
         """Initialise with cut-off length, significance level, and edge-guard settings."""
+        legacy_l = kwargs.pop("l", None)
+        if kwargs:
+            msg = f"StarsTest: unexpected keyword arguments: {', '.join(sorted(kwargs))}"
+            raise TypeError(msg)
+        if legacy_l is not None:
+            if cutoff_length != 10:
+                msg = "StarsTest: specify only one of 'cutoff_length' or legacy 'l'"
+                raise TypeError(msg)
+            cutoff_length = legacy_l
         super().__init__(alpha=alpha, min_years_from_end=min_years_from_end, min_relative_signal=min_relative_signal)
-        self.l = l
+        self.l = cutoff_length
         if alpha not in _T_CRIT:
             msg = f"StarsTest: alpha must be one of {sorted(_T_CRIT)}, got {alpha}"
             raise ValueError(msg)
