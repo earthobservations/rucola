@@ -17,6 +17,8 @@ Climate station data homogenization implementing the six-step procedure from [Go
 
 > **Beta:** rucola is under active development. The API may change between minor versions before a stable 1.0 release.
 
+> **About the name:** *rucola* is the Italian word for the salad green known in English as arugula or rocket — and it's only one letter away from **Rouco**, the surname of [J. Fidel González-Rouco](https://doi.org/10.1175/1520-0442(2001)014%3C0964:QCAHOP%3E2.0.CO;2), first author of the 2001 paper this library implements.
+
 ## Overview
 
 Long climate records from ground stations are frequently affected by non-climatic discontinuities — station relocations, instrument replacements, changes in observation practice. rucola detects and corrects these breakpoints using an iterative reference-station approach:
