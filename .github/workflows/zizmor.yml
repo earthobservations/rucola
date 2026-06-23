@@ -22,7 +22,7 @@ jobs:
     outputs:
       workflows: ${{ steps.filter.outputs.workflows }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
 
@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Acquire sources
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.0.3
         with:
           persist-credentials: false
 
